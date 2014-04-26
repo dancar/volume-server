@@ -18,15 +18,13 @@ post '/volume' do
 end
 
 post '/mute' do
-  File.write(LAST_VOLUME_FILE, get_volume)
-  set_volume 0
+  mute
   200
 end
 
-post '/restore' do
-  volume = File.read(LAST_VOLUME_FILE).to_i
-  set_volume(volume)
-  [200, volume.to_s]
+post '/unmute' do
+  unmute
+  [200, get_volume]
 end
 
 get '/' do
@@ -42,4 +40,12 @@ end
 def set_volume(volume)
   raise "invalid volume" unless volume.is_a?(Integer) and volume.between?(0,100)
   `amixer set Master #{volume}%`
+end
+
+def mute
+  `amixer set Master mute`
+end
+
+def unmute
+  `amixer set Master unmute`
 end
