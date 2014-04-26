@@ -1,40 +1,129 @@
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+
     <style>
-      body {
+     body {
        text-align: center;
        background: black;
-       color: white;
-       font-size: 3em;
+       color: green;
      }
-     input, button {
-       width: 80%;
+
+     #slider {
+       margin: auto;
+       height: 95%;
+
      }
-      #volume {
+
+     table {
        width: 100%;
-       display: block;
+       height: 100%;
+     }
+
+     td {
+       font-size: 2em;
+       border: 0px solid green;
+       text-align: center;
+       vertical-align: middle;
+       padding: 0px 10px;
+     }
+
+     button {
+       width: 40%;
+       height: 30px;
+     }
+
+     .buttons-row > td {
+       width: 50%;
      }
 
     </style>
-
+    <link href="jquery.nouislider.css" rel="stylesheet">
   </head>
   <body>
-    <form action="/volume" method="POST">
-      <label for="volume">Volume: </label>
-      <input id="volume" type="range" name="volume" min="0" max="100" />
-      <input type="submit" value="Set" />
-    </form>
+    <table>
+      <tr >
+        <td colspan=2 id="label">
+        </td>
+      </tr>
+      <tr style="height: 100%">
+        <td colspan=2style="vertical-align: middle; width: 30px;">
+          <div id="slider"> </div>
+        </td>
+      </tr>
+      <tr class="buttons-row">
+        <td >
+          <button id="mute">Mute</button>
+        </td>
+        <td>
+          <button id="restore">Restore</button>
+        </td>
+      </tr>
+    </table>
+    <script type="text/javascript" src="jquery-1.10.0.min.js"></script>
+    <script type="text/javascript" src="jquery.nouislider.min.js"></script>
+
     <script type="text/javascript">
-     volumeElem = document.getElementById("volume")
-     request = new XMLHttpRequest()
-     request.onreadystatechange = function () {
-       if (request.readyState === 4 && request.status >= 200 &&
-           request.status < 400) {
-         volumeElem.value = request.responseText;
-       }
+     window.slider = $("#slider");
+
+     window.setSliderValue = function (val) {
+       slider.noUiSlider({start: parseInt(val)}, true);
      }
-     request.open("GET", "/volume", true);
-     request.send();
+
+     $.ajax("/volume", {
+       success: setSliderValue
+     });
+
+     window.setVolume = function (vol) {
+       $.ajax("/volume", {
+         type: "POST",
+         data: {
+           volume: vol
+         }
+       });
+     }
+
+     $("#mute").click(function () {
+       $.ajax("/mute", {
+         type: "POST",
+         success: function () {
+           setSliderValue(0);
+         }
+       });
+     });
+
+     $("#restore").click(function () {
+       $.ajax("/restore", {
+         type: "POST",
+         success: setSliderValue
+       });
+     });
+
+     slider.noUiSlider({
+       orientation: "vertical",
+       direction: "rtl",
+       start: 0,
+       range: {
+         min: 0,
+         max: 100
+       },
+       serialization: {
+         lower: [
+           $.Link({
+             target: $("#label")
+           })
+         ],
+         format: {
+           decimals: 0,
+           postfix: "%"
+         }
+       }
+     });
+
+     slider.change(function (event, ui) {
+       value = parseInt(slider.val())
+       setVolume(value)
+     });
 
     </script>
   </body>
