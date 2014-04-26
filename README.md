@@ -1,6 +1,8 @@
 Volume-Server
 =============
 
+![Screenshot](/screenshot.jpg?raw=true "Screenshot")
+
 This is a (very) simple server which lets you remotely control the Master audio
 volume of its host.
 
