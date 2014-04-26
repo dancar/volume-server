@@ -14,12 +14,13 @@ Dependencies
 0. amixer
 1. Ruby
 2. Sinatra
+3. Thin (optional)
 
 Usage
 -----
 
 ```
-    # ruby volume-server.rtb
+$ ruby volume-server.rb
 ```
 
 
